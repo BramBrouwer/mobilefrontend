@@ -1,0 +1,18 @@
+<ion-header>
+    <ion-navbar>
+      <ion-title>Beacon details</ion-title>
+    </ion-navbar>  
+  </ion-header>
+  
+  <ion-content padding>  
+    <ion-list *ngIf="retrievedBeacon">
+      <ion-item>
+        <ion-title *ngIf="!retrievedBeacon.title">No title found</ion-title>
+        <ion-title *ngIf="retrievedBeacon.title">{{retrievedBeacon.title}}</ion-title>
+      </ion-item>
+      <ion-item text-wrap>
+        {{retrievedBeacon.description}}
+      </ion-item>
+      <ion-item-divider></ion-item-divider>
+    </ion-list>  
+  </ion-content>

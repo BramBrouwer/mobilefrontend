@@ -61,3 +61,16 @@ typings/
 /platforms/
 www/
 platforms/
+
+node_modules
+www
+.tmp
+.sass-cache
+<%= appPath %>/bower_components
+coverage
+platforms
+plugins
+*.swp
+*.swo
+*.log
+*.DS_Store

@@ -249,12 +249,64 @@ var MyApp = (function () {
     return MyApp;
 }());
 MyApp = __decorate([
-    Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({template:/*ion-inline-start:"C:\Users\Flex\Documents\GitHub\mobilefrontend\src\app\app.html"*/'<ion-nav [root]="rootPage"></ion-nav>\n'/*ion-inline-end:"C:\Users\Flex\Documents\GitHub\mobilefrontend\src\app\app.html"*/
+    Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({template:/*ion-inline-start:"C:\Users\Flex\Documents\GitHub\mobilefrontend\src\app\app.html"*/'<ion-nav [root]="rootPage"></ion-nav>\n\n'/*ion-inline-end:"C:\Users\Flex\Documents\GitHub\mobilefrontend\src\app\app.html"*/
     }),
     __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* Platform */], __WEBPACK_IMPORTED_MODULE_2__ionic_native_status_bar__["a" /* StatusBar */], __WEBPACK_IMPORTED_MODULE_3__ionic_native_splash_screen__["a" /* SplashScreen */]])
 ], MyApp);
 
 //# sourceMappingURL=app.component.js.map
+
+/***/ }),
+
+/***/ 269:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ScanService; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ionic_native_ble__ = __webpack_require__(77);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_Subject__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_Subject___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_rxjs_Subject__);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+var ScanService = (function () {
+    function ScanService(ble) {
+        this.ble = ble;
+        this.subject = new __WEBPACK_IMPORTED_MODULE_2_rxjs_Subject__["Subject"]();
+    }
+    /*
+        Scan for beacons. Called on page start&page refresh
+      */
+    ScanService.prototype.scanForBeacons = function () {
+        var _this = this;
+        this.ble.scan([], 10).subscribe(function (device) {
+            var adData = new Uint8Array(device.advertising);
+            device.advertising = adData;
+            if (device.name) {
+                _this.foundDevices.push(device);
+                _this.subject.next(_this.foundDevices);
+            }
+        });
+    };
+    return ScanService;
+}());
+ScanService = __decorate([
+    Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["B" /* Injectable */])(),
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__ionic_native_ble__["a" /* BLE */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__ionic_native_ble__["a" /* BLE */]) === "function" && _a || Object])
+], ScanService);
+
+var _a;
+//# sourceMappingURL=scan.js.map
 
 /***/ }),
 
@@ -321,6 +373,9 @@ BeaconService = __decorate([
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ionic_native_ble__ = __webpack_require__(77);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_beacons__ = __webpack_require__(76);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__beacon_detail_beacon_detail__ = __webpack_require__(102);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_scan__ = __webpack_require__(269);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_rxjs_Subject__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_rxjs_Subject___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_rxjs_Subject__);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -335,11 +390,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
+
 var HomePage = (function () {
-    function HomePage(navCtrl, ble, beaconService) {
+    function HomePage(navCtrl, ble, beaconService, scanService) {
         this.navCtrl = navCtrl;
         this.ble = ble;
         this.beaconService = beaconService;
+        this.scanService = scanService;
+        this.subject = new __WEBPACK_IMPORTED_MODULE_6_rxjs_Subject__["Subject"]();
         this.zone = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["P" /* NgZone */]({ enableLongStackTrace: false });
         this.foundDevices = [];
         this.scanForBeacons();
@@ -349,15 +408,19 @@ var HomePage = (function () {
    */
     HomePage.prototype.scanForBeacons = function () {
         var _this = this;
-        this.ble.scan([], 10).subscribe(function (device) {
-            _this.zone.run(function () {
-                var adData = new Uint8Array(device.advertising);
-                device.advertising = adData;
-                if (device.name) {
-                    _this.foundDevices.push(device);
-                }
-            });
+        this.scanService.scanForBeacons();
+        this.subject.subscribe(function (value) {
+            _this.foundDevices = value;
         });
+        // this.ble.scan([], 10).subscribe(device => {
+        //   this.zone.run(() => {
+        //     var adData = new Uint8Array(device.advertising);
+        //     device.advertising = adData;
+        //     if(device.name){
+        //       this.foundDevices.push(device);          
+        //     }
+        //   })
+        // })
     };
     /*
      Refresh page
@@ -387,11 +450,10 @@ HomePage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
         selector: 'page-home',template:/*ion-inline-start:"C:\Users\Flex\Documents\GitHub\mobilefrontend\src\pages\home\home.html"*/'<ion-header>\n  \n    <ion-navbar>\n      <ion-title text-uppercase>Find beacons</ion-title>\n    </ion-navbar>\n  \n  </ion-header>\n  \n  <ion-content class="dark" padding>\n  \n      <ion-refresher (ionRefresh)="doRefresh($event)">\n          <ion-refresher-content\n            pullingIcon="arrow-dropdown"\n            pullingText="Pull to scan"\n            refreshingSpinner="dots"\n            refreshingText="Scanning...">\n          </ion-refresher-content>\n        </ion-refresher>\n  \n    <ion-list>\n      <button ion-item *ngFor="let beacon of foundDevices" (click)="goToDetails(beacon)">\n        <h2>{{ beacon?.name }}</h2>\n       \n        \n        <ion-icon name="arrow-forward" item-right></ion-icon>\n      </button>\n    </ion-list>\n  </ion-content>\n  \n  \n  '/*ion-inline-end:"C:\Users\Flex\Documents\GitHub\mobilefrontend\src\pages\home\home.html"*/
     }),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */],
-        __WEBPACK_IMPORTED_MODULE_2__ionic_native_ble__["a" /* BLE */],
-        __WEBPACK_IMPORTED_MODULE_3__services_beacons__["a" /* BeaconService */]])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_2__ionic_native_ble__["a" /* BLE */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__ionic_native_ble__["a" /* BLE */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_3__services_beacons__["a" /* BeaconService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__services_beacons__["a" /* BeaconService */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_5__services_scan__["a" /* ScanService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_5__services_scan__["a" /* ScanService */]) === "function" && _d || Object])
 ], HomePage);
 
+var _a, _b, _c, _d;
 //# sourceMappingURL=home.js.map
 
 /***/ })

@@ -219,6 +219,7 @@ var MyApp = (function () {
     function MyApp(menu, platform, statusBar, splashScreen, scanService, toast) {
         var _this = this;
         this.menu = menu;
+        this.platform = platform;
         this.scanService = scanService;
         this.toast = toast;
         this.rootPage = __WEBPACK_IMPORTED_MODULE_4__pages_home_home__["a" /* HomePage */];
@@ -228,6 +229,33 @@ var MyApp = (function () {
             // Here you can do any higher level native things you might need.
             statusBar.styleDefault();
             splashScreen.hide();
+            //back button handle
+            //Registration of push in Android and Windows Phone
+            var lastTimeBackPress = 0;
+            var timePeriodToExit = 2000;
+            platform.registerBackButtonAction(function () {
+                // get current active page
+                var view = _this.nav.getActive();
+                if (view.component.name == "HomePage") {
+                    //Double check to exit app                  
+                    if (new Date().getTime() - lastTimeBackPress < timePeriodToExit) {
+                        _this.platform.exitApp(); //Exit from app
+                    }
+                    else {
+                        var toast_1 = _this.toast.create({
+                            message: 'Press back again to exit App?',
+                            duration: 3000,
+                            position: 'bottom'
+                        });
+                        toast_1.present();
+                        lastTimeBackPress = new Date().getTime();
+                    }
+                }
+                else {
+                    // go to previous page
+                    _this.nav.setRoot(__WEBPACK_IMPORTED_MODULE_4__pages_home_home__["a" /* HomePage */]);
+                }
+            });
         });
         self.scanService.subject.subscribe(function (value) {
             self.foundDevices = value;

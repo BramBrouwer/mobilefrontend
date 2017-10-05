@@ -38,7 +38,7 @@ export class MyApp {
       platform.registerBackButtonAction(() => {
         // get current active page
         let view = this.nav.getActive();
-        if (view.component.name == "TabsPage") {
+        if (view.component.name == "HomePage") {
           //Double check to exit app                  
           if (new Date().getTime() - lastTimeBackPress < timePeriodToExit) {
             this.platform.exitApp(); //Exit from app

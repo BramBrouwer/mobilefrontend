@@ -3,11 +3,8 @@ import { NavController } from 'ionic-angular';
 import { Beacon } from "../../models/beacon";
 import { BleScanResponse } from "../../models/bleScanResponse";
 import { BLE } from '@ionic-native/ble';
-import { BeaconService } from "../../services/beacons";
 import { BeaconDetailPage } from "../beacon-detail/beacon-detail";
 import { ScanService } from "../../services/scan";
-import { Subject } from "rxjs/Subject";
-
 
 @Component({
   selector: 'page-home',
@@ -18,62 +15,43 @@ export class HomePage {
   foundDevices: Array<BleScanResponse>;
   zone: NgZone;
   testBeacon: Beacon;
-  subject: Subject<Array<BleScanResponse>> = new Subject();
   constructor(
-    public navCtrl: NavController, 
+    public navCtrl: NavController,
     public ble: BLE,
-    private beaconService: BeaconService,
     private scanService: ScanService) {
     this.zone = new NgZone({ enableLongStackTrace: false });
-    this.foundDevices = [];
-    this.scanForBeacons();
-  }
-
-   /*
-    Scan for beacons. Called on page start&page refresh
-  */
-  scanForBeacons(){
-    this.scanService.scanForBeacons();
-    this.subject.subscribe(value => {
-      this.foundDevices = value;
+    this.scanService.subject.subscribe(value => {
+      this.zone.run(() => {
+        this.foundDevices = value;
+      })
     })
-    // this.ble.scan([], 10).subscribe(device => {
-    //   this.zone.run(() => {
-    //     var adData = new Uint8Array(device.advertising);
-    //     device.advertising = adData;
-    //     if(device.name){
-    //       this.foundDevices.push(device);          
-    //     }
-    //   })
-    // })
-
+    this.scanService.scanForBeacons();
   }
 
-   /*
-    Refresh page
-  */
+  /*
+   Refresh page
+ */
   doRefresh(refresher) {
-    this.foundDevices = [];
-    this.scanForBeacons();
+    this.scanService.scanForBeacons();
     setTimeout(() => {
       refresher.complete();
-    }, 5000);
+    }, 8000);
   }
 
-    /*
-    Utility
-  */
+  /*
+  Utility
+*/
   ionViewDidLoad() {
     console.log('ionViewDidLoad BeaconsPage');
   }
-  
+
   /*
     Navigate to detail page and pass currently selected beacon
   */
   goToDetails(beacon: BleScanResponse) {
     this.navCtrl.push(BeaconDetailPage, { beacon });
-  }  
-  
-  
+  }
+
+
 
 }

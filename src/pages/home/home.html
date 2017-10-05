@@ -1,9 +1,7 @@
 <ion-header>
-  
     <ion-navbar>
       <ion-title text-uppercase>Find beacons</ion-title>
     </ion-navbar>
-  
   </ion-header>
   
   <ion-content class="dark" padding>
@@ -18,7 +16,7 @@
         </ion-refresher>
   
     <ion-list>
-      <button ion-item *ngFor="let beacon of foundDevices | async" (click)="goToDetails(beacon)">
+      <button ion-item *ngFor="let beacon of foundDevices" (click)="goToDetails(beacon)">
         <h2>{{ beacon?.name }}</h2>
         <ion-icon name="arrow-forward" item-right></ion-icon>
       </button>

@@ -10,6 +10,7 @@ import { HomePage } from '../pages/home/home';
 import { BeaconDetailPage } from "../pages/beacon-detail/beacon-detail";
 import { BeaconService } from "../services/beacons";
 import { BLE } from "@ionic-native/ble";
+import { ScanService } from "../services/scan";
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { BLE } from "@ionic-native/ble";
     SplashScreen,
     { provide: ErrorHandler, useClass: IonicErrorHandler },
     BeaconService,
-    BLE
+    BLE,
+    ScanService
   ]
 })
 export class AppModule { }

@@ -22,9 +22,9 @@
         <param name="android-package" value="io.ionic.keyboard.IonicKeyboard" />
         <param name="onload" value="true" />
     </feature>
-    <name>MyApp</name>
-    <description>An awesome Ionic/Cordova app.</description>
-    <author email="hi@ionicframework" href="http://ionicframework.com/">Ionic Framework Team</author>
+    <name>BLE-Platform</name>
+    <description>Enter's Bluetooth Low Energy Beacon Platform</description>
+    <author email="info@enter-group.nl" href="http://www.enter-group.nl/en/">Ionic Framework Team</author>
     <content original-src="index.html" src="http://192.168.1.99:8100" />
     <access origin="*" />
     <allow-navigation href="http://ionic.local/*" />
